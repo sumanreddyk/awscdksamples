@@ -17,6 +17,7 @@ import software.amazon.awscdk.services.ec2.Peer;
 import software.amazon.awscdk.services.ec2.Port;
 import software.amazon.awscdk.services.ec2.SecurityGroupProps;
 import software.amazon.awscdk.services.ec2.SubnetConfiguration;
+import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.SubnetType;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ec2.VpcProps;
@@ -88,19 +89,35 @@ public class SandboxStack extends Stack {
     //  .
     //  .build() ;
 
-      Instance webServer = new Instance(this, "webServer",
+    //   Instance webServer = new Instance(this, "webServer",
+    //    InstanceProps.builder()
+    //    .instanceType(InstanceType.of(
+    //        InstanceClass.BURSTABLE2, InstanceSize.MICRO))
+    //    .machineImage(webImage)
+    //    .vpc(birenzi)
+    //    .instanceName("WebServer")
+    
+    //    .securityGroup(web)
+    //    .sourceDestCheck(false)
+    //    .vpcSubnets
+    //    .build());
+
+       Instance webServer2 = new Instance(this, "webServer2",
        InstanceProps.builder()
        .instanceType(InstanceType.of(
            InstanceClass.BURSTABLE2, InstanceSize.MICRO))
        .machineImage(webImage)
        .vpc(birenzi)
-       .instanceName("WebServer")
-       .keyName("BirenziWebServer")
+       .instanceName("WebServer2")
+    //    .keyName("BirenziWebServer")
        .securityGroup(web)
        .sourceDestCheck(false)
-    //    .vpcSubnets( )
-    //    .userData(userDat)
-    // .VpcSubnet
+       .vpcSubnets(
+           SubnetSelection.
+           builder()
+           .subnetType(SubnetType.PUBLIC)
+           .build()
+           )
        .build());
 
        
