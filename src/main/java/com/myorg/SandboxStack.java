@@ -33,6 +33,7 @@ public class SandboxStack extends Stack {
 
     public SandboxStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
+        int azNumber =2;
         
         SubnetConfiguration pu=SubnetConfiguration.builder().name("web").subnetType(SubnetType.PUBLIC).build();
         SubnetConfiguration pr=SubnetConfiguration.builder().name("application").subnetType(SubnetType.PRIVATE).build();
@@ -51,7 +52,7 @@ public class SandboxStack extends Stack {
          .enableDnsHostnames(false)
          .enableDnsSupport(false)
         // //AZs
-         .maxAzs(2)
+         .maxAzs(azNumber)
         // //define subnets to build for each AZ
          .subnetConfiguration(Arrays.asList(pu, pr,is))
         // //define number of NatGateways 
@@ -101,27 +102,64 @@ public class SandboxStack extends Stack {
     //    .sourceDestCheck(false)
     //    .vpcSubnets
     //    .build());
+    //create webservers
+    createLinuxEc2Instance
+    ("WebServer",
+    "WebServer",
+    InstanceType.of(
+        InstanceClass.BURSTABLE2, InstanceSize.MICRO)
+        , SubnetSelection.
+        builder()
+        .subnetType(SubnetType.PUBLIC)
+        .build(),
+        birenzi,
+        azNumber,
+        webImage,
+        web
+    );
+              
+    
+     //create API servers
+       createLinuxEc2Instance
+        ("ApplicationServer",
+        "ApplicationServer",
+        InstanceType.of(
+            InstanceClass.BURSTABLE2, InstanceSize.MICRO)
+            , SubnetSelection.
+            builder()
+            .subnetType(SubnetType.PRIVATE)
+            .build(),
+            birenzi,
+            azNumber,
+            webImage,
+            web
+        );
 
-       Instance webServer2 = new Instance(this, "webServer2",
-       InstanceProps.builder()
-       .instanceType(InstanceType.of(
-           InstanceClass.BURSTABLE2, InstanceSize.MICRO))
-       .machineImage(webImage)
-       .vpc(birenzi)
-       .instanceName("WebServer2")
-    //    .keyName("BirenziWebServer")
-       .securityGroup(web)
-       .sourceDestCheck(false)
-       .vpcSubnets(
-           SubnetSelection.
-           builder()
-           .subnetType(SubnetType.PUBLIC)
-           .build()
-           )
-       .build());
-
-       
-        
+        //Create RDS cluster
+      
     }
+
+    //create API servers
+   
+
+    private void createLinuxEc2Instance(String id, String instanceName, InstanceType instanceType,SubnetSelection subnet, Vpc vpc,int azNumber, AmazonLinuxImage image,SecurityGroup securityGroup){
+        for( int i=0; i<= azNumber; i++){
+            new Instance(this, id+i,
+            InstanceProps.builder()
+            .instanceType(instanceType)
+            .machineImage(image)
+            .vpc(vpc)
+            .instanceName(instanceName+i)
+            .securityGroup(securityGroup)
+            .sourceDestCheck(false)
+            .vpcSubnets(
+               subnet )
+            .build());
+            }
+        } 
+   
+
+
+    
 }
  
