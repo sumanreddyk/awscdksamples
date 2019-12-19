@@ -47,6 +47,12 @@
             <artifactId>ec2</artifactId>
             <version>1.19.0</version>
         </dependency>
+         <!-- AWS EC2 -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>autoscaling</artifactId>
+            <version>1.19.0</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
