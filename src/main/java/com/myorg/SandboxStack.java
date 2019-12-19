@@ -3,11 +3,13 @@ package com.myorg;
 import software.amazon.awscdk.core.Construct;
 import software.amazon.awscdk.core.Stack;
 import software.amazon.awscdk.core.StackProps;
+import software.amazon.awscdk.cxapi.AvailabilityZonesContextQuery;
 import software.amazon.awscdk.services.ec2.AmazonLinuxEdition;
 import software.amazon.awscdk.services.ec2.AmazonLinuxGeneration;
 import software.amazon.awscdk.services.ec2.AmazonLinuxImage;
 import software.amazon.awscdk.services.ec2.AmazonLinuxStorage;
 import software.amazon.awscdk.services.ec2.AmazonLinuxVirt;
+import software.amazon.awscdk.services.ec2.ISecurityGroup;
 import software.amazon.awscdk.services.ec2.Instance;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceProps;
@@ -34,6 +36,15 @@ public class SandboxStack extends Stack {
     public SandboxStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
         int azNumber =2;
+
+        //     //Create Image
+        AmazonLinuxImage webImage = 
+        AmazonLinuxImage.Builder.create()
+        .generation(AmazonLinuxGeneration.AMAZON_LINUX)
+        .edition(AmazonLinuxEdition.STANDARD)
+        .virtualization(AmazonLinuxVirt.HVM)
+        .storage(AmazonLinuxStorage.GENERAL_PURPOSE)
+        .build();
         
         SubnetConfiguration pu=SubnetConfiguration.builder().name("web").subnetType(SubnetType.PUBLIC).build();
         SubnetConfiguration pr=SubnetConfiguration.builder().name("application").subnetType(SubnetType.PRIVATE).build();
@@ -63,7 +74,7 @@ public class SandboxStack extends Stack {
          );
 
     //     //create security group
-        SecurityGroup web = new SecurityGroup(this,"weSecurityGroup"
+        SecurityGroup webSG = new SecurityGroup(this,"WebSG"
         ,SecurityGroupProps
         .builder()
         .vpc(birenzi)
@@ -72,67 +83,37 @@ public class SandboxStack extends Stack {
         .build()
         );
     //     // allowing SSH
-        web.addIngressRule(Peer.anyIpv4(), Port.tcp(22),"Allow SSH access from the world ");
-        
-    //     //Create Image
-      AmazonLinuxImage webImage = 
-      AmazonLinuxImage.Builder.create()
-      .generation(AmazonLinuxGeneration.AMAZON_LINUX)
-      .edition(AmazonLinuxEdition.STANDARD)
-      .virtualization(AmazonLinuxVirt.HVM)
-      .storage(AmazonLinuxStorage.GENERAL_PURPOSE)
-      .build();
-    //    //create UserData
-    //   UserData
-    
-    //   //Select Subnets
-    // SubnetSelection sub = SubnetSelection.builder()
-    //  .
-    //  .build() ;
+        webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(22),"Allow SSH access from the world ");
+        webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(80),"Allow HTTP on port 80 access from the world ");
+        webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(443),"Allow HTTP on port 80 access from the world ");
 
-    //   Instance webServer = new Instance(this, "webServer",
-    //    InstanceProps.builder()
-    //    .instanceType(InstanceType.of(
-    //        InstanceClass.BURSTABLE2, InstanceSize.MICRO))
-    //    .machineImage(webImage)
-    //    .vpc(birenzi)
-    //    .instanceName("WebServer")
-    
-    //    .securityGroup(web)
-    //    .sourceDestCheck(false)
-    //    .vpcSubnets
-    //    .build());
-    //create webservers
-    createLinuxEc2Instance
-    ("WebServer",
-    "WebServer",
-    InstanceType.of(
-        InstanceClass.BURSTABLE2, InstanceSize.MICRO)
-        , SubnetSelection.
-        builder()
-        .subnetType(SubnetType.PUBLIC)
-        .build(),
-        birenzi,
-        azNumber,
-        webImage,
-        web
-    );
+        SecurityGroup applicationSG = new SecurityGroup(this,"ApplicationSG"
+        ,SecurityGroupProps
+        .builder()
+        .vpc(birenzi)
+        .description("ApplicationSG")
+        .allowAllOutbound(true)
+        .build()
+        );
+        //     // allowing SSH
+        applicationSG.addIngressRule(webSG, Port.tcp(22),"Allow SSH access from the world ");
+        applicationSG.addIngressRule(webSG, Port.tcp(8082),"Allow HTTP on port 8082 access from the world ");
+        applicationSG.addIngressRule(webSG, Port.tcp(443),"Allow HTTPs on port 8082 access from the world ");
+        
+        //create webservers
+        createLinuxEc2Instance("WebServer", "WebServer",InstanceType.of(
+            InstanceClass.BURSTABLE2, InstanceSize.MICRO)
+            ,SubnetSelection.builder().subnetType(SubnetType.PUBLIC).onePerAz(true).build(),
+            birenzi,azNumber,webImage,webSG
+        );
               
     
      //create API servers
-       createLinuxEc2Instance
-        ("ApplicationServer",
-        "ApplicationServer",
-        InstanceType.of(
-            InstanceClass.BURSTABLE2, InstanceSize.MICRO)
-            , SubnetSelection.
-            builder()
-            .subnetType(SubnetType.PRIVATE)
-            .build(),
-            birenzi,
-            azNumber,
-            webImage,
-            web
+       createLinuxEc2Instance("ApplicationServer", "ApplicationServer",InstanceType.of(
+               InstanceClass.BURSTABLE2, InstanceSize.MICRO)
+               ,SubnetSelection.builder().subnetType(SubnetType.PRIVATE).onePerAz(true).build(),birenzi,azNumber,
+                webImage,applicationSG
+
         );
 
         //Create RDS cluster
@@ -141,9 +122,9 @@ public class SandboxStack extends Stack {
 
     //create API servers
    
-
+   
     private void createLinuxEc2Instance(String id, String instanceName, InstanceType instanceType,SubnetSelection subnet, Vpc vpc,int azNumber, AmazonLinuxImage image,SecurityGroup securityGroup){
-        for( int i=0; i<= azNumber; i++){
+        for( int i=0; i< azNumber; i++){
             new Instance(this, id+i,
             InstanceProps.builder()
             .instanceType(instanceType)
@@ -153,7 +134,8 @@ public class SandboxStack extends Stack {
             .securityGroup(securityGroup)
             .sourceDestCheck(false)
             .vpcSubnets(
-               subnet )
+               subnet)
+            .availabilityZone(vpc.getAvailabilityZones().get(i))
             .build());
             }
         } 
