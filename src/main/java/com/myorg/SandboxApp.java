@@ -7,7 +7,8 @@ public class SandboxApp {
     public static void main(final String[] args) {
         App app = new App();
 
-        new SandboxStack(app, "BirenziVpc");
+        SandboxStack infra= new SandboxStack(app, "InfrastructureStac");
+        Ec2Stack ec2=new Ec2Stack(app, "Ec2Stack",infra.getVpc());
 
         app.synth();
     }

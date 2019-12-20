@@ -48,11 +48,11 @@
             <version>1.19.0</version>
         </dependency>
          <!-- AWS EC2 -->
-        <dependency>
+        <!-- <dependency>
             <groupId>software.amazon.awscdk</groupId>
             <artifactId>autoscaling</artifactId>
             <version>1.19.0</version>
-        </dependency>
+        </dependency> -->
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
