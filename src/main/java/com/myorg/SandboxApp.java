@@ -1,6 +1,7 @@
 package com.myorg;
 
 import software.amazon.awscdk.core.App;
+import software.amazon.awscdk.services.ec2.Vpc;
 
 
 public class SandboxApp {
@@ -8,7 +9,13 @@ public class SandboxApp {
         App app = new App();
 
         SandboxStack infra= new SandboxStack(app, "InfrastructureStac");
-        Ec2Stack ec2=new Ec2Stack(app, "Ec2Stack",infra.getVpc());
+        InstanceStack ec2=new InstanceStack(app, "Ec2Stack",new SharedVpcPros(){
+        
+            @Override
+            public Vpc getVpc() {
+                return infra.getVpc();
+            }
+        });
 
         app.synth();
     }
