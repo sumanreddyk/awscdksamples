@@ -1,15 +1,15 @@
-package com.myorg;
+package andy.birenzi;
 
 import software.amazon.awscdk.core.App;
 import software.amazon.awscdk.services.ec2.Vpc;
 
 
-public class SandboxApp {
+public class MainApp {
     public static void main(final String[] args) {
         App app = new App();
 
-        SandboxStack infra= new SandboxStack(app, "InfrastructureStac");
-        InstanceStack ec2=new InstanceStack(app, "Ec2Stack",new SharedVpcPros(){
+        InfrastructureStack infra= new InfrastructureStack(app, "InfrastructureStack");
+        InstanceStack ec2=new InstanceStack(app, "InstanceStack",new SharedVpcPros(){
         
             @Override
             public Vpc getVpc() {

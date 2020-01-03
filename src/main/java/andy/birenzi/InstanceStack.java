@@ -1,4 +1,4 @@
-package com.myorg;
+package andy.birenzi;
 
 import software.amazon.awscdk.core.Construct;
 import software.amazon.awscdk.core.Stack;
@@ -22,12 +22,12 @@ import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ec2.SecurityGroup;
 
 
-public class Ec2Stack  extends Stack  {
-    public Ec2Stack(final Construct scope, final String id) {
+public class InstanceStack  extends Stack  {
+    public InstanceStack(final Construct scope, final String id) {
         this(scope, id, null);
     }
 
-    public Ec2Stack(final Construct scope, final String id, final SharedVpcPros props) {
+    public InstanceStack(final Construct scope, final String id, final SharedVpcPros props) {
         super(scope, id, props);
         final int azNumber = 2;
         final String webServerKeyName = "WebServerKeys";

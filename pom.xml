@@ -3,8 +3,8 @@
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.myorg</groupId>
-    <artifactId>SandboxApp</artifactId>
+    <groupId>andy.birenzi</groupId>
+    <artifactId>MainApp</artifactId>
     <version>0.1</version>
 
     <properties>
@@ -28,7 +28,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <mainClass>com.myorg.SandboxApp</mainClass>
+                    <mainClass>andy.birenzi.MainApp</mainClass>
                 </configuration>
             </plugin>
         </plugins>

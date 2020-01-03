@@ -1,4 +1,4 @@
-package com.myorg;
+package andy.birenzi;
 
 import software.amazon.awscdk.core.Construct;
 import software.amazon.awscdk.core.Stack;
@@ -11,13 +11,13 @@ import software.amazon.awscdk.services.ec2.VpcProps;
 
 import java.util.*;
 
-public class SandboxStack extends Stack {
+public class InfrastructureStack extends Stack {
     private  Vpc vpc=null;
-    public SandboxStack(final Construct scope, final String id) {
+    public InfrastructureStack(final Construct scope, final String id) {
         this(scope, id, null);
     }
 
-    public SandboxStack(final Construct scope, final String id, final StackProps props) {
+    public InfrastructureStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
         int azNumber =2;
       
