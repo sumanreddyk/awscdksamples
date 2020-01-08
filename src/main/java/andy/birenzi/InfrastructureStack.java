@@ -22,16 +22,16 @@ public class InfrastructureStack extends Stack {
         int azNumber =2;
       
        
-        SubnetConfiguration pu=SubnetConfiguration.builder().name("web").subnetType(SubnetType.PUBLIC).build();
-        SubnetConfiguration pr=SubnetConfiguration.builder().name("application").subnetType(SubnetType.PRIVATE).build();
-        SubnetConfiguration is=SubnetConfiguration.builder().name("rds").subnetType(SubnetType.ISOLATED).build();
+        SubnetConfiguration publicSubnet=SubnetConfiguration.builder().name("web").subnetType(SubnetType.PUBLIC).build();
+        SubnetConfiguration privateSubnet=SubnetConfiguration.builder().name("application").subnetType(SubnetType.PRIVATE).build();
+        SubnetConfiguration IsolatedSubnet=SubnetConfiguration.builder().name("rds").subnetType(SubnetType.ISOLATED).build();
     
 
         // Vpc birenzi = new Vpc(this, "BIrenzi");
         //Create VPC
          this.vpc = new Vpc(this, "birenzi",VpcProps.builder().cidr("10.0.0.0/24")
                             .enableDnsHostnames(false) .enableDnsSupport(false).maxAzs(azNumber)
-                            .subnetConfiguration(Arrays.asList(pu, pr,is))
+                            .subnetConfiguration(Arrays.asList(publicSubnet, privateSubnet,IsolatedSubnet))
                             .natGateways(2)
                             .build()
                             );
