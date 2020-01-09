@@ -132,14 +132,19 @@ public class InstanceStack  extends Stack  {
         BaseApplicationListenerProps webListener= BaseApplicationListenerProps.builder().port(80).open(true).build();
         AddApplicationTargetGroupsProps.builder().targetGroups(new ArrayList<IApplicationTargetGroup>());
         
-        ApplicationTargetGroup test= new ApplicationTargetGroup(this, "id", ApplicationTargetGroupProps.builder()
+
+        List<IApplicationLoadBalancerTarget> targets=new ArrayList<IApplicationLoadBalancerTarget>();
+        targets.add(webASG);
+        ApplicationTargetGroup webTargetGroup= new ApplicationTargetGroup(this, "id", ApplicationTargetGroupProps.builder()
                                     .vpc(props.getVpc()).targetType(TargetType.INSTANCE)
+                                    .targets(targets)
                                     .port(80).protocol(ApplicationProtocol.HTTPS).build());
-        test.registerConnectable(webASG);
-        test.addTarget();
-        List<IApplicationTargetGroup> target=new ArrayList<IApplicationTargetGroup>();
-        target.add(test);
-        webELB.addListener("WebListener",webListener).addTargetGroups(id, AddApplicationTargetGroupsProps.builder().targetGroups(target).build());
+        
+        List<IApplicationTargetGroup> targetGroups=new ArrayList<IApplicationTargetGroup>();
+        targetGroups.add(webTargetGroup);
+        
+        // test.addTarget(target);
+        webELB.addListener("WebListener",webListener).addTargetGroups(id, AddApplicationTargetGroupsProps.builder().targetGroups(targetGroups).build());
        
          
         // ApplicationTargetGroup applicationFleet=  new ApplicationTargetGroup(this, "AppFleet", ApplicationTargetGroupProps.builder().targets(Itargets).build());
