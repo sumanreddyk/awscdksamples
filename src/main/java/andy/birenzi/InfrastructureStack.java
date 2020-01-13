@@ -13,6 +13,7 @@ import java.util.*;
 
 public class InfrastructureStack extends Stack {
     private  Vpc vpc=null;
+    private final String cidr="10.0.0.0/24";
     public InfrastructureStack(final Construct scope, final String id) {
         this(scope, id, null);
     }
@@ -29,12 +30,13 @@ public class InfrastructureStack extends Stack {
 
         // Vpc birenzi = new Vpc(this, "BIrenzi");
         //Create VPC
-         this.vpc = new Vpc(this, "birenzi",VpcProps.builder().cidr("10.0.0.0/24")
-                            .enableDnsHostnames(false) .enableDnsSupport(false).maxAzs(azNumber)
+         this.vpc = new Vpc(this, "birenzi",VpcProps.builder().cidr(cidr)
+                            .enableDnsHostnames(false) .enableDnsSupport(true).maxAzs(azNumber)
                             .subnetConfiguration(Arrays.asList(publicSubnet, privateSubnet,IsolatedSubnet))
                             .natGateways(2)
                             .build()
                             );
+            
 
     }
     public Vpc getVpc(){
