@@ -27,8 +27,6 @@ public class InfrastructureStack extends Stack {
         SubnetConfiguration privateSubnet=SubnetConfiguration.builder().name("application").subnetType(SubnetType.PRIVATE).build();
         SubnetConfiguration IsolatedSubnet=SubnetConfiguration.builder().name("rds").subnetType(SubnetType.ISOLATED).build();
     
-
-        // Vpc birenzi = new Vpc(this, "BIrenzi");
         //Create VPC
          this.vpc = new Vpc(this, "birenzi",VpcProps.builder().cidr(cidr)
                             .enableDnsHostnames(false) .enableDnsSupport(true).maxAzs(azNumber)

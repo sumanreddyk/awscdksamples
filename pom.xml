@@ -47,19 +47,39 @@
             <artifactId>ec2</artifactId>
             <version>1.20.0</version>
         </dependency>
-          <!-- AWS EC2 -->
+          <!-- AWS loadBalancer -->
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
             <artifactId> elasticloadbalancingv2</artifactId>
             <version>1.20.0</version>
         </dependency>
        
-         <!-- AWS EC2 -->
+         <!-- AWS autoscaling -->
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
             <artifactId>autoscaling</artifactId>
             <version>1.20.0</version>
         </dependency>
+         <!-- AWS codedeploy -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>codedeploy</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+           <!-- AWS EC2 -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>codepipeline</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+            <!-- AWS EC2 -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>codebuild</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+        
+        
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
