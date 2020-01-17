@@ -78,6 +78,12 @@
             <artifactId>codebuild</artifactId>
             <version>1.20.0</version>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>iam</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+        
         
         
 

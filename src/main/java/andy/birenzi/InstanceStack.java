@@ -62,6 +62,7 @@ public class InstanceStack  extends Stack  {
         .instanceType( InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO)).machineImage(props.getAMIs())
         .minCapacity(2).maxCapacity(3).vpcSubnets(SubnetSelection.builder().subnets(props.getVpc().getPublicSubnets()).build())
         .keyName(webServerKeyName)
+        .role(props.getRole())
         .userData(myUserData.getUserData())
         .build();
         webASG.addSecurityGroup(webSG);
