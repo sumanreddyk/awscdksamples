@@ -1,9 +1,7 @@
-package andy.birenzi;
+package andy.birenzi.stacks;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+import andy.birenzi.model.MyUserData;
+import andy.birenzi.props.Ec2Props;
 import software.amazon.awscdk.core.Construct;
 import software.amazon.awscdk.core.Stack;
 import software.amazon.awscdk.services.autoscaling.AutoScalingGroup;
@@ -15,33 +13,23 @@ import software.amazon.awscdk.services.ec2.Port;
 import software.amazon.awscdk.services.ec2.SecurityGroupProps;
 import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.Vpc;
-import software.amazon.awscdk.services.elasticloadbalancingv2.AddApplicationTargetGroupsProps;
-import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
-import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationProtocol;
-import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationTargetGroup;
-import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationTargetGroupProps;
-import software.amazon.awscdk.services.elasticloadbalancingv2.BaseApplicationListenerProps;
-import software.amazon.awscdk.services.elasticloadbalancingv2.IApplicationLoadBalancerTarget;
-import software.amazon.awscdk.services.elasticloadbalancingv2.IApplicationTargetGroup;
-import software.amazon.awscdk.services.elasticloadbalancingv2.TargetType;
+
 import software.amazon.awscdk.services.ec2.SecurityGroup;
 
+public class WebStack extends Stack {
+    private AutoScalingGroup webASG;
 
-public class InstanceStack  extends Stack  {
-      
-    public InstanceStack(final Construct scope, final String id) {
+    public WebStack(final Construct scope, final String id) {
         this(scope, id, null);
     }
 
-    public InstanceStack(final Construct scope, final String id, final SharedPros props) {
+    public WebStack(final Construct scope, final String id, final Ec2Props props) {
         super(scope, id, props);
         final String webServerKeyName = "WebServerKeys";
-        final MyUserData myUserData = new MyUserData();
-        // final String applicationServerKeyName = "ApplicationServersKey";
        
-        // //create security groups
-
-        final SecurityGroup webSG = createSecurityGroup("webSG", props.getVpc(), "WebServer layer SG", true);
+       final MyUserData myUserData = new MyUserData();
+       
+       SecurityGroup webSG = createSecurityGroup("webSG", props.getVpc(), "WebServer layer SG", true);
         // // allowing SSH
         webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(22), "Allow SSH access from the world ");
         webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(80), "Allow HTTP on port 80 access from the world ");
@@ -53,51 +41,16 @@ public class InstanceStack  extends Stack  {
         applicationSG.addIngressRule(webSG, Port.tcp(22), "Allow SSH access from the world ");
         applicationSG.addIngressRule(webSG, Port.tcp(8082), "Allow HTTP on port 8082 access from the world ");
         applicationSG.addIngressRule(webSG, Port.tcp(443), "Allow HTTPs on port 8082 access from the world ");
-       
-
-                                  
-       
-
-         AutoScalingGroup webASG= AutoScalingGroup.Builder.create(this, "WebASG").vpc(props.getVpc())
+  
+         this.webASG= AutoScalingGroup.Builder.create(this, "WebASG").vpc(props.getVpc())
         .instanceType( InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO)).machineImage(props.getAMIs())
-        .minCapacity(2).maxCapacity(3).vpcSubnets(SubnetSelection.builder().subnets(props.getVpc().getPublicSubnets()).build())
+        .minCapacity(1).maxCapacity(3).vpcSubnets(SubnetSelection.builder().subnets(props.getVpc().getPublicSubnets()).build())
         .keyName(webServerKeyName)
         .role(props.getRole())
         .userData(myUserData.getUserData())
         .build();
         webASG.addSecurityGroup(webSG);
-       
-        final ApplicationLoadBalancer webELB= ApplicationLoadBalancer.Builder.create(this, "webELB")
-                                            .vpc(props.getVpc())
-                                            .internetFacing(true)
-                                            .loadBalancerName("webELB")
-                                            //.vpcSubnets(props.getVpc().getPublicSubnets())
-                                            .build();
-
-        //Create a Listener
-        BaseApplicationListenerProps webListener= BaseApplicationListenerProps
-                                                  .builder().port(80).open(true).build();
-
-        //Add AutoScaling group as an ELB target
-        List<IApplicationLoadBalancerTarget> targets=new ArrayList<IApplicationLoadBalancerTarget>();
-        targets.add(webASG);
-
-        //Create a target group
-        ApplicationTargetGroup webTargetGroup= new ApplicationTargetGroup(this, "id", ApplicationTargetGroupProps.builder()
-                                    .vpc(props.getVpc()).targetType(TargetType.INSTANCE)
-                                    .targets(targets)
-                                    .port(80).protocol(ApplicationProtocol.HTTP)
-                                    .build());
-
-        //Add targets to Target group
-        List<IApplicationTargetGroup> targetGroups=new ArrayList<IApplicationTargetGroup>();
-        targetGroups.add(webTargetGroup);
-        
-        // Add Listener and Target group to ELB
-        webELB.addListener("WebListener",webListener).addTargetGroups(id, AddApplicationTargetGroupsProps.builder().targetGroups(targetGroups).build());
-              
-       
-
+ 
     }
 
     // create SGs
@@ -106,6 +59,9 @@ public class InstanceStack  extends Stack  {
 
         return new SecurityGroup(this, id, SecurityGroupProps.builder().vpc(vpc).description(description)
                 .allowAllOutbound(allowAllOutbound).securityGroupName(this.getStackName()+"-"+id).build());
+    }
+    public AutoScalingGroup getAutoScalingGroup(){
+        return this.webASG;
     }
      /** Unused samples codes:
       * 

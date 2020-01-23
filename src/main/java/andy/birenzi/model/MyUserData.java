@@ -1,4 +1,4 @@
-package andy.birenzi;
+package andy.birenzi.model;
 
 import software.amazon.awscdk.services.ec2.UserData;
 
@@ -17,16 +17,14 @@ public class MyUserData {
                 ,"/bin/echo 'Environment=\"JASYPT_ENCRYPTOR_PASSWORD=XXXXXXXXXXX\"' >> "+serviceName
                 ,"/bin/echo 'Environment=\"LOG_PATH=/var/log/duo/myduodevices\"' >> "+serviceName
                 ,"/bin/echo 'Environment=\"JAVA_OPTS=-Xmx2048M\"' >> "+serviceName
-                ,"/bin/echo 'Environment=\"SPRING_PROFILES_ACTIVE=test\"' >> "+serviceName
-                ,"/bin/echo 'User=ec2-user' >> "+serviceName
+                ,"/bin/echo 'Environment=\"SPRING_PROFILES_ACTIVE=local\"' >> "+serviceName
+                ,"/bin/echo 'User=root' >> "+serviceName
                 ,"/bin/echo 'ExecStart=/opt/duodevicemanagement/myduodevices.jar' >> "+serviceName
                 ,"/bin/echo 'SuccessExitStatus=143' >> "+serviceName
                 ,"/bin/echo '[Install]' >> "+serviceName
                 ,"/bin/echo 'WantedBy=multi-user.target' >> "+serviceName
 
         );
-        //  userData.addCommands("#cloud-config");
-        //  userData.addCommands("output: {all: '| tee -a /var/log/cloud-init-output.log'}");
          userData.addCommands("sudo amazon-linux-extras install epel");
          userData.addCommands("sudo yum update -y");
          userData.addCommands("sudo yum install java-1.8.0-openjdk -y");
@@ -34,6 +32,7 @@ public class MyUserData {
          userData.addCommands("cd /etc/systemd/system/");
          userData.addCommands(service);
          userData.addCommands("mkdir -p /var/log/duo/myduodevices");
+         userData.addCommands("mkdir -p /opt/duodevicemanagement/");
          userData.addCommands("systemctl daemon-reload");
          userData.addCommands("systemctl start duo");
          userData.addCommands("sudo systemctl enable duo");

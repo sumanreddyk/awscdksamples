@@ -1,4 +1,4 @@
-package andy.birenzi;
+package andy.birenzi.model;
 
 import java.util.Arrays;
 
@@ -28,7 +28,13 @@ public class Ec2InstanceRole extends Stack{
         PolicyStatement getParameters= PolicyStatement.Builder.create()
                                             .effect(Effect.ALLOW)
                                             .actions(Arrays.asList("ssm:GetParameters"))
-                                            .resources(Arrays.asList("arn:aws:ssm:"+env.getRegion()+":"+env.getAccount()+":parameter/Jasypt_*"))
+                                            .resources(Arrays.asList("arn:aws:ssm:"+env.getRegion()+":"+env.getAccount()+":parameter/duo_*"))
+                                           
+                                            .build();
+                                            PolicyStatement getParameter= PolicyStatement.Builder.create()
+                                            .effect(Effect.ALLOW)
+                                            .actions(Arrays.asList("ssm:GetParameter"))
+                                            .resources(Arrays.asList("arn:aws:ssm:"+env.getRegion()+":"+env.getAccount()+":parameter/duo_*"))
                                            
                                             .build();
     PolicyStatement decrypt= PolicyStatement.Builder.create()
@@ -39,6 +45,7 @@ public class Ec2InstanceRole extends Stack{
 
         instanceRole.addToPolicy(getParameters);
         instanceRole.addToPolicy(decrypt);
+        instanceRole.addToPolicy(getParameter);
     }
     public Role getRole(){
         return this.instanceRole;

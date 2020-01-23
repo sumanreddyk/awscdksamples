@@ -1,4 +1,4 @@
-package andy.birenzi;
+package andy.birenzi.stacks;
 
 import software.amazon.awscdk.core.Construct;
 import software.amazon.awscdk.core.Stack;

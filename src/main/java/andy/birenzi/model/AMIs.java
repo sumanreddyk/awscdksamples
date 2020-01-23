@@ -1,4 +1,4 @@
-package andy.birenzi;
+package andy.birenzi.model;
 
 import software.amazon.awscdk.services.ec2.AmazonLinuxEdition;
 import software.amazon.awscdk.services.ec2.AmazonLinuxGeneration;
