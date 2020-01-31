@@ -36,9 +36,6 @@ public class MainApp {
             }
 
         });
-      
-    
-       
 
         app.synth();
     }
