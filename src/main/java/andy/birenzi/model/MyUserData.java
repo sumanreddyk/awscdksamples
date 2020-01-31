@@ -14,7 +14,6 @@ public class MyUserData {
                 ,"/bin/echo 'Description=DuoDeviceManagementPortal' >> "+serviceName 
                 ,"/bin/echo 'After=syslog.target' >> "+serviceName
                 ,"/bin/echo '[Service]' >> "+serviceName
-                ,"/bin/echo 'Environment=\"JASYPT_ENCRYPTOR_PASSWORD=XXXXXXXXXXX\"' >> "+serviceName
                 ,"/bin/echo 'Environment=\"LOG_PATH=/var/log/duo/myduodevices\"' >> "+serviceName
                 ,"/bin/echo 'Environment=\"JAVA_OPTS=-Xmx2048M\"' >> "+serviceName
                 ,"/bin/echo 'Environment=\"SPRING_PROFILES_ACTIVE=local\"' >> "+serviceName
@@ -33,6 +32,9 @@ public class MyUserData {
          userData.addCommands(service);
          userData.addCommands("mkdir -p /var/log/duo/myduodevices");
          userData.addCommands("mkdir -p /opt/duodevicemanagement/");
+         userData.addCommands("aws s3 cp s3://bowdoinesrepo/myduodevices.jar /opt/duodevicemanagement/");
+         userData.addCommands("cd /opt/duodevicemanagement/");
+         userData.addCommands("chmod +x myduodevices.jar");
          userData.addCommands("systemctl daemon-reload");
          userData.addCommands("systemctl start duo");
          userData.addCommands("sudo systemctl enable duo");
