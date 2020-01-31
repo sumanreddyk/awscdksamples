@@ -1,4 +1,4 @@
-# Welcome to your CDK Java project!
+# AWS CDK Java project! This project includes: Setting up VPC, Subnets, Autoscaling groups, ELB, ELB listerners and rules and much more
 
 This is a blank project for Java development with CDK.
 
