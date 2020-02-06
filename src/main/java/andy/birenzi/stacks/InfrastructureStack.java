@@ -22,17 +22,19 @@ public class InfrastructureStack extends Stack {
         super(scope, id, props);
         int azNumber = 2;
 
-        SubnetConfiguration publicSubnet = SubnetConfiguration.builder().name("web").subnetType(SubnetType.PUBLIC)
+        SubnetConfiguration publicSubnet = SubnetConfiguration.builder().name("WebSubnet").subnetType(SubnetType.PUBLIC)
                 .build();
-        SubnetConfiguration privateSubnet = SubnetConfiguration.builder().name("application")
-                .subnetType(SubnetType.PRIVATE).build();
-        SubnetConfiguration IsolatedSubnet = SubnetConfiguration.builder().name("rds").subnetType(SubnetType.ISOLATED)
+                //changed this to isolated to prevent the requirement for an NAT
+        SubnetConfiguration privateSubnet = SubnetConfiguration.builder().name("APISubnet")
+                .subnetType(SubnetType.ISOLATED).build();
+        SubnetConfiguration isolatedSubnet = SubnetConfiguration.builder().name("RDSSubnet").subnetType(SubnetType.ISOLATED)
                 .build();
 
         // Create VPC
-        this.vpc = new Vpc(this, "birenzi",
+        this.vpc = new Vpc(this, "Duo",
                 VpcProps.builder().cidr(cidr).enableDnsHostnames(false).enableDnsSupport(true).maxAzs(azNumber)
-                        .subnetConfiguration(Arrays.asList(publicSubnet, privateSubnet, IsolatedSubnet)).natGateways(2)
+                        .subnetConfiguration(Arrays.asList(publicSubnet, privateSubnet, isolatedSubnet))
+                        // .natGateways(1)
                         .build());
 
     }

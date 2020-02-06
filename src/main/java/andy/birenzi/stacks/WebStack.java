@@ -47,7 +47,7 @@ public class WebStack extends Stack {
 
         SecurityGroup webSG = createSecurityGroup("webSG", props.getVpc(), "WebServer layer SG", true);
         // // allowing SSH
-        webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(22), "Allow SSH access from the world ");
+        webSG.addIngressRule(Peer.ipv4("139.140.92.21/25"), Port.tcp(22), "Allow SSH access from the world ");
         webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(80), "Allow HTTP on port 80 access from the world ");
         webSG.addIngressRule(Peer.anyIpv4(), Port.tcp(443), "Allow HTTPs on port 443 access from the world ");
 
@@ -58,14 +58,17 @@ public class WebStack extends Stack {
         applicationSG.addIngressRule(webSG, Port.tcp(8082), "Allow HTTP on port 8082 access from the world ");
         applicationSG.addIngressRule(webSG, Port.tcp(443), "Allow HTTPs on port 8082 access from the world ");
 
-        AutoScalingGroup webASG = new AutoScalingGroup(this, "WebASG",
-                AutoScalingGroupProps.builder().vpc(props.getVpc())
-                        .instanceType(InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO))
-                        .machineImage(props.getAMIs())
-
-                        .minCapacity(1).maxCapacity(3)
-                        .vpcSubnets(SubnetSelection.builder().subnets(props.getVpc().getPublicSubnets()).build())
-                        .keyName(webServerKeyName).role(props.getRole()).userData(myUserData.getUserData()).build());
+        AutoScalingGroup webASG = new AutoScalingGroup(
+                                 this, "WebASG",
+                                AutoScalingGroupProps
+                                .builder()
+                                .vpc(props.getVpc())
+                                .instanceType(InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO))
+                                .machineImage(props.getAMIs())
+                                 .minCapacity(1).maxCapacity(3)
+                                .vpcSubnets(SubnetSelection.builder().subnets(props.getVpc().getPublicSubnets()).build())
+                                .keyName(webServerKeyName).role(props.getRole()).userData(myUserData.getUserData()).build());
+                                
         webASG.addSecurityGroup(webSG);
 
         createELB(props.getVpc(), webASG);
@@ -76,8 +79,16 @@ public class WebStack extends Stack {
     private SecurityGroup createSecurityGroup(final String id, final Vpc vpc, final String description,
             final boolean allowAllOutbound) {
 
-        return new SecurityGroup(this, id, SecurityGroupProps.builder().vpc(vpc).description(description)
-                .allowAllOutbound(allowAllOutbound).securityGroupName(this.getStackName() + "-" + id).build());
+        return new SecurityGroup(
+                    this, id, 
+                    SecurityGroupProps
+                    .builder()
+                    .vpc(vpc)
+                    .description(description)
+                    .allowAllOutbound(allowAllOutbound)
+                    .securityGroupName(this.getStackName() + "-" + id)
+                    .build()
+                    );
     }
 
     // create ELB
